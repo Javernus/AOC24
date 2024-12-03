@@ -7,7 +7,7 @@ import gleam/string.{split}
 import simplifile
 
 pub fn get_data() -> String {
-  let assert Ok(data) = simplifile.read("src/data_1.txt")
+  let assert Ok(data) = simplifile.read("src/data/1.txt")
   data
 }
 

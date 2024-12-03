@@ -2,4 +2,4 @@
 *.ez
 /build
 erl_crash.dump
-**/data_*.txt
+**/data/*.txt
