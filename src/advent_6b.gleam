@@ -3,12 +3,13 @@ import gleam/int
 import gleam/io
 import gleam/list
 import gleam/result
+import gleam/set.{type Set}
 import parallel_map.{WorkerAmount, list_pmap}
 import simplifile
 import utilities/grid.{type Grid, type Position, Position}
 
 type Visited =
-  List(#(Position, Direction))
+  Set(#(Position, Direction))
 
 type Direction {
   Up
@@ -65,10 +66,10 @@ fn guard_walk(
   direction: Direction,
   visited: Visited,
 ) -> #(Bool, Visited) {
-  case list.contains(visited, #(position, direction)) {
+  case set.contains(visited, #(position, direction)) {
     True -> #(True, visited)
     False -> {
-      let visited = list.append(visited, [#(position, direction)])
+      let visited = set.insert(visited, #(position, direction))
       let next_pos = next_position(position, direction)
       let cell = get_position(grid, next_pos)
 
@@ -83,17 +84,17 @@ fn guard_walk(
 
 pub fn main() {
   let #(grid, starting_pos) = get_grid()
-  let #(_, visited) = guard_walk(grid, starting_pos, Up, [])
+  let #(_, visited) = guard_walk(grid, starting_pos, Up, set.new())
 
   let object_count =
     visited
-    |> list.map(fn(t) { t.0 })
-    |> list.filter(fn(p) { p.r != starting_pos.r || p.c != starting_pos.c })
-    |> list.unique
+    |> set.map(fn(t) { t.0 })
+    |> set.filter(fn(p) { p.r != starting_pos.r || p.c != starting_pos.c })
+    |> set.to_list
     |> list_pmap(
       fn(p) {
         let new_grid = dict.insert(grid, p, "#")
-        guard_walk(new_grid, starting_pos, Up, []).0
+        guard_walk(new_grid, starting_pos, Up, set.new()).0
       },
       WorkerAmount(24),
       5000,
