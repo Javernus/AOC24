@@ -1,5 +1,5 @@
-import advent_5b
+import advent_6b
 
 pub fn main() {
-  advent_5b.main()
+  advent_6b.main()
 }
