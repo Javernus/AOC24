@@ -5,6 +5,7 @@ import gleam/option.{Some}
 import gleam/regexp
 import gleam/result
 import gleam/string
+import parallel_map.{WorkerAmount, list_pmap}
 import simplifile
 
 pub fn get_data() -> String {
@@ -36,16 +37,9 @@ fn mul_add(input: #(Int, List(Int))) -> Int {
     case acc {
       [] -> [number]
       numbers ->
-        []
-        |> list.append(numbers |> list.map(fn(n) { n + number }))
-        |> list.append(numbers |> list.map(fn(n) { n * number }))
-        |> list.append(
-          numbers
-          |> list.map(fn(n) {
-            let assert Ok(n) =
-              parse(string.append(int.to_string(n), int.to_string(number)))
-            n
-          }),
+        list.append(
+          numbers |> list.map(fn(n) { n + number }),
+          numbers |> list.map(fn(n) { n * number }),
         )
     }
   })
@@ -63,7 +57,8 @@ pub fn main() {
   let output =
     data
     |> parse_data
-    |> map(mul_add)
+    |> list_pmap(mul_add, WorkerAmount(14), 1000)
+    |> map(fn(x) { result.unwrap(x, 0) })
     |> int.sum
 
   io.println(int.to_string(output))
