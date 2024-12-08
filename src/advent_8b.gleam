@@ -42,12 +42,24 @@ fn get_antinodes(positions: #(Position, Position), size: Int) -> List(Position) 
 
   let rows = list.range(0, size - 1)
 
-  rows
-  |> list.filter(fn(row) { { row - position1.r } % row_difference == 0 })
-  |> list.map(fn(row) {
-    let difference = { row - position1.r } / row_difference
-    Position(row, position1.c + difference * column_difference)
-  })
+  case row_difference {
+    0 ->
+      rows
+      |> list.filter(fn(column) {
+        { column - position1.c } % column_difference == 0
+      })
+      |> list.map(fn(column) {
+        let difference = { column - position1.c } / column_difference
+        Position(position1.r + difference * row_difference, column)
+      })
+    _ ->
+      rows
+      |> list.filter(fn(row) { { row - position1.r } % row_difference == 0 })
+      |> list.map(fn(row) {
+        let difference = { row - position1.r } / row_difference
+        Position(row, position1.c + difference * column_difference)
+      })
+  }
 }
 
 fn find_antinodes(
