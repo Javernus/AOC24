@@ -66,18 +66,28 @@ fn get_directions(grid: Grid(Int), position: Position) -> List(Position) {
   })
 }
 
-fn find_trailheads(grid: Grid(Int), position: Position, value: Int) -> Int {
+fn find_trailheads(
+  grid: Grid(Int),
+  position: Position,
+  value: Int,
+) -> List(Position) {
   get_directions(grid, position)
   |> list.map(fn(position) {
     let assert Ok(v) = get_position(grid, position)
 
     case v == value + 1, v == 9 {
-      True, True -> 1
+      True, True -> [position]
       True, _ -> find_trailheads(grid, position, v)
-      False, _ -> 0
+      False, _ -> []
     }
   })
-  |> int.sum
+  |> list.flatten
+}
+
+fn count_trailheads(grid: Grid(Int), zero: Position) -> Int {
+  find_trailheads(grid, zero, 0)
+  |> list.unique
+  |> list.length
 }
 
 pub fn main() {
@@ -86,7 +96,7 @@ pub fn main() {
   zeroes
   |> set.to_list
   |> list_pmap(
-    fn(zero) { find_trailheads(grid, zero, 0) },
+    fn(zero) { count_trailheads(grid, zero) },
     WorkerAmount(14),
     1000,
   )

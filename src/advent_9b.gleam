@@ -4,16 +4,11 @@ import gleam/list.{map}
 import gleam/option.{Some}
 import gleam/regexp
 import gleam/result
-import gleam/set
 import simplifile
 
 type Block {
   Empty(size: Int)
   Block(size: Int, id: Int)
-}
-
-fn is_valid_line(line: String) -> Bool {
-  line != ""
 }
 
 fn parse_data() -> List(Block) {
@@ -40,26 +35,13 @@ fn parse_data() -> List(Block) {
   |> list.flatten
 }
 
-fn add_block(size: Int, block: Block) -> #(Bool, List(Block)) {
-  let assert Block(block_size, id) = block
-
-  case size > block_size {
-    True -> #(True, [Block(block_size, id), Empty(size - block_size)])
-    False ->
-      case size == block_size {
-        True -> #(True, [Block(block_size, id)])
-        False -> #(False, [Empty(size)])
-      }
-  }
-}
-
 fn get_last_block(blocks: List(Block)) -> #(Block, List(Block)) {
   let first = blocks |> list.reverse |> list.first
   let rest = blocks |> list.reverse |> list.rest |> result.unwrap([])
 
   case first {
     Ok(Block(size, id)) -> #(Block(size, id), list.reverse(rest))
-    Ok(Empty(size)) -> get_last_block(list.reverse(rest))
+    Ok(Empty(_)) -> get_last_block(list.reverse(rest))
     _ -> #(Empty(0), [])
   }
 }
