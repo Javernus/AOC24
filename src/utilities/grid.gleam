@@ -1,4 +1,5 @@
 import gleam/dict.{type Dict}
+import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
@@ -34,4 +35,38 @@ pub fn to_list_of_lists(str: String) -> List(List(String)) {
   |> string.split("\n")
   |> list.map(string.trim)
   |> list.map(string.to_graphemes)
+}
+
+pub fn print(grid: Grid(String)) -> Nil {
+  let #(width, height) =
+    grid
+    |> dict.fold(#(0, 0), fn(acc, key, _) {
+      let #(ax, ay) = acc
+      let Position(x, y) = key
+
+      case ax < x, ay < y {
+        True, True -> #(x, y)
+        True, _ -> #(x, ay)
+        _, True -> #(ax, y)
+        _, _ -> acc
+      }
+    })
+
+  {
+    use x <- list.map(list.range(0, width))
+    io.println("")
+    use y <- list.map(list.range(0, height))
+
+    let current = dict.get(grid, Position(x, y))
+
+    case current {
+      Ok(a) -> io.print(a)
+      Error(_) -> io.print(" ")
+    }
+
+    Nil
+  }
+
+  io.println("")
+  io.println("")
 }
