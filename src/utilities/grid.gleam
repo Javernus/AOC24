@@ -53,9 +53,9 @@ pub fn print(grid: Grid(String)) -> Nil {
     })
 
   {
-    use x <- list.map(list.range(0, width))
-    io.println("")
     use y <- list.map(list.range(0, height))
+    io.println("")
+    use x <- list.map(list.range(0, width))
 
     let current = dict.get(grid, Position(x, y))
 
