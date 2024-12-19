@@ -1,5 +1,5 @@
-import week_3/advent_18b
+import week_3/advent_19b
 
 pub fn main() {
-  advent_18b.main()
+  advent_19b.main()
 }
